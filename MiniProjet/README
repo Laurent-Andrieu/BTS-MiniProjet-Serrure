@@ -1,0 +1,1 @@
+Pour accorder temporairement des droits d'accès au port UART: sudo chown laurent /dev/ttyUSB0
