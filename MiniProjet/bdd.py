@@ -17,9 +17,9 @@ loc_pwd = ""
 
 def rx_info():
     data = rx_data.decode("utf-8").split(",")
-    usr_id = data[1]
+    usr_code = data[1]
     sens = data[2]
-    return usr_id, sens
+    return usr_code, sens
 
 
 def bdd_fetch(table):
@@ -35,13 +35,10 @@ def db_write(table, val, col):
 
 def user_check():
     usr = bdd_fetch("utilisateurs")
-    usr_id = usr[0][0]
-    usr_code = usr[0][3]
     code = rx_info()[0]
-    if code == usr_code:
-        return True, usr_id
-    else:
-        return "No match"
+    for info in usr:
+        if code in info[3]:
+            return True, info[0], info[2], info[3]
 
 
 mydb = None
@@ -72,6 +69,6 @@ while True:
     if user_check()[0] is True:
         db_write("journal", (user_check()[1], date_a, rx_info()[1]), ("user_id", "date_action", "sens"))
         uart.write_data(tx, bytes("1", "utf-8"))
-        print("User is allowed")
+        print(f"User {user_check()[2]}:{user_check()[3]} is allowed")
     else:
-        print("User is not allowed")
+        print(f"User is not allowed")
