@@ -41,6 +41,16 @@ def user_check():
             return True, info[0], info[2], info[3]
 
 
+def override():
+    with open("lock.txt", "+w", encoding="utf-8") as file:
+        file.readline()
+        if "1" in file:
+            file.writelines("0")
+            file.close()
+            return True
+        else:
+            return False
+
 mydb = None
 while not mydb:
     try:
@@ -53,7 +63,7 @@ while not mydb:
         if mydb:
             print(f"\nConnected to '{mydb.database}'")
     except Exception as conerr:
-        print("Tentative de reconnection")
+        print("Reconnection")
         subprocess.call(f"echo {loc_pwd} | sudo -S systemctl start mysql", shell=True)
 
 cursor = mydb.cursor()
@@ -70,5 +80,7 @@ while True:
         db_write("journal", (user_check()[1], date_a, rx_info()[1]), ("user_id", "date_action", "sens"))
         uart.write_data(tx, bytes("1", "utf-8"))
         print(f"User {user_check()[2]}:{user_check()[3]} is allowed")
+    if override() is True:
+        uart.write_data(tx, bytes("1", "utf-8"))
     else:
         print(f"User is not allowed")
